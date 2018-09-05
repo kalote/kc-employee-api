@@ -40,7 +40,7 @@ spec:
       - env:
         - name: MONGODB_HOST
           value: mongo-0
-        image: myprivatereg.azurecr.io/employee-api:#{Release.Artifacts.Backend.BuildId}#
+        image: myprivatereg.azurecr.io/employee-api:#{Build.BuildId}#
         imagePullPolicy: IfNotPresent
         name: employee-api
         ports:
