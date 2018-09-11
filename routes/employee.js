@@ -13,6 +13,15 @@ employeeRouter.use('/:employeeId', async (req, res, next) => {
   }
 });
 
+employeeRouter.route('/company/:compId')
+  .get(async (req, res) => {
+    const getByCompId = await Employee.find({ companyId: req.params.compId }).exec().catch((err) => {
+      console.log('Something went wrong! ', err);
+      res.status(500).send(err);
+    });
+    res.json(getByCompId);
+  })
+
 employeeRouter.route('/')
   .get(async (req, res) => {
     const getAll = await Employee.find({}).exec().catch((err) => {
