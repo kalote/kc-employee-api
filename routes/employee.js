@@ -3,24 +3,15 @@ import Employee from '../models/employee';
 
 const employeeRouter = express.Router();
 
-employeeRouter.use('/:employeeId', async (req, res, next) => {
-  try {
-    let emp = await Employee.findById(req.params.employeeId).exec();
-    req.employee = emp;
-    next();
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
-
-employeeRouter.route('/company/:compId')
-  .get(async (req, res) => {
-    const getByCompId = await Employee.find({ companyId: req.params.compId }).exec().catch((err) => {
+employeeRouter.get('/company/:compId', async (req, res) => {
+  const getByCompId = await Employee
+    .find({ companyId: String(req.params.compId) })
+    .exec().catch((err) => {
       console.log('Something went wrong! ', err);
       res.status(500).send(err);
     });
-    res.json(getByCompId);
-  })
+  res.json(getByCompId);
+});
 
 employeeRouter.route('/')
   .get(async (req, res) => {
@@ -35,26 +26,36 @@ employeeRouter.route('/')
     let newEmployee = await employee.save().catch((err) => {
       console.log('Something went wrong! ', err);
       res.status(500).send(err);
-    });;
+    });
     res.status(200).send(newEmployee);
   });
 
 employeeRouter.route('/:employeeId')
   .get(async (req, res) => {
-    res.json(req.employee);
+    try {
+      let emp = await Employee.findById(req.params.employeeId).exec();
+      res.json(emp);
+    } catch (err) {
+      res.status(500).send(err);
+    }
   })
   .put(async (req, res) => {
-    req.employee.name = req.body.name ? req.body.name : req.employee.name;
-    req.employee.email = req.body.email ? req.body.email : req.employee.email;
-    req.employee.position = req.body.position ? req.body.position : req.employee.position;
-    req.employee.department = req.body.department ? req.body.department : req.employee.department;
-    req.employee.companyId = req.body.companyId ? req.body.companyId : req.employee.companyId;
-    req.employee.companyName = req.body.companyName ? req.body.companyName : req.employee.companyName;
-    let newOne = await req.employee.save().catch((err) => {
+    try {
+      let emp = await Employee.findById(req.params.employeeId).exec();
+    } catch (err) {
+      res.status(500).send(err);
+    }
+    emp.name = req.body.name ? req.body.name : emp.name;
+    emp.email = req.body.email ? req.body.email : emp.email;
+    emp.position = req.body.position ? req.body.position : emp.position;
+    emp.department = req.body.department ? req.body.department : emp.department;
+    emp.company = req.body.company ? req.body.company : emp.company;
+    emp.companyName = req.body.companyName ? req.body.companyName : emp.companyName;
+    let newOne = await emp.save().catch((err) => {
       console.log('Something went wrong! ', err);
       res.status(500).send(err);
     });
-    res.json(req.employee);
+    res.json(emp);
   })
   .delete(async (req, res) => {
     let deletedOne = await Employee.findOneAndDelete({ _id: req.params.employeeId }).exec().catch((err) => {
